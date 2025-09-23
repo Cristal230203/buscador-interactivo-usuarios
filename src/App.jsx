@@ -7,12 +7,16 @@ import { ToastContainer} from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import { motion } from 'framer-motion'
 import { CircularProgress } from '@mui/material'
+import { useAuth } from './context/AuthContext'
 
 export default function App() {
   const [usuarios, setUsuarios] = useState([])
   const [loading, setLoading] = useState(false)
   const [modalAbierto, setModalAbierto] = useState(false)
   const [usuarioSeleccionado, setUsuarioSeleccionado] = useState(null)
+  
+
+  const { logout } = useAuth()
 
   const [buscando, setBuscando] = useState(false)
 
@@ -84,8 +88,10 @@ export default function App() {
     setUsuarioSeleccionado(null)
   }
 
+
   return (
     <div className="min-h-screen bg-gray-100 p-4">
+      <button className='bg-red-500 text-white px-4 py-2 rounded' onClick={logout}>logout</button>
       <h1 className="text-2xl font-bold mb-4 text-center">
         Buscador interactivo
       </h1>
