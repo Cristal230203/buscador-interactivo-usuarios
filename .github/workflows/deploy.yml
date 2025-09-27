@@ -3,7 +3,7 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches:
-      - develop   # 👈 Se ejecutará cuando hagas push a la rama develop
+      - develop   
 
 permissions:
   contents: read   # 👈 corregido (no "red")
