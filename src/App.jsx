@@ -1,25 +1,20 @@
 import { useEffect, useState, useCallback } from 'react'
 import SearchInput from './components/SearchInput'
-import UserCard from './components/UserCard'
+import TodoItem from './toDoItem'
 import axios from 'axios'
-import ReactModal from 'react-modal'
-import { ToastContainer} from 'react-toastify'
+
+import { ToastContainer, toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import { motion } from 'framer-motion'
 import { CircularProgress } from '@mui/material'
 import { useAuth } from './context/AuthContext'
-
+ 
 export default function App() {
   const [usuarios, setUsuarios] = useState([])
   const [loading, setLoading] = useState(false)
-  const [modalAbierto, setModalAbierto] = useState(false)
   const [usuarioSeleccionado, setUsuarioSeleccionado] = useState(null)
-  
-
   const { logout } = useAuth()
-
   const [buscando, setBuscando] = useState(false)
-
   const [filtrados, setFiltrados] = useState([])
 
   const API_URL = 'http://localhost:3001'
@@ -27,7 +22,6 @@ export default function App() {
   const obtenerUsuarios = async () => {
     try {
       const response = await axios.get(`${API_URL}/usuarios`)
-
       setUsuarios(response.data)
       setFiltrados(response.data)
     } catch (error) {
@@ -78,15 +72,38 @@ export default function App() {
     [usuarios]
   )
 
-  const abrirModal = (usuario) => {
-    setUsuarioSeleccionado(usuario)
-    setModalAbierto(true)
+
+
+
+  const [tareas, setTareas] = useState([]);
+
+  const [input, setInput] = useState("");
+
+
+  const agregarTarea = () => {
+
+    if (input.trim()) {
+      setTareas([...tareas, { id: Date.now(), text: input.trim(), completed: false }]);
+      setInput("");
+    };
+
   }
 
-  const cerrarModal = () => {
-    setModalAbierto(false)
-    setUsuarioSeleccionado(null)
+
+  const toggleCompleted = (id) => {
+    setTareas(
+      tareas.map((tarea) =>
+        tarea.id === id ? { ...tarea, completed: !tarea.completed } : tarea
+      )
+    );
+  };
+
+
+  const eliminarTarea = (id) => {
+    setTareas(tareas.filter((tarea) => tarea.id !== id));
+
   }
+
 
 
   return (
@@ -114,57 +131,35 @@ export default function App() {
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {Array.isArray(filtrados) &&
             filtrados.map((usuario) => (
-              <UserCard
-                onClick={() => abrirModal(usuario)}
-                key={usuario.id}
-                usuario={usuario}
-              />
+              tareas.map((tarea) => (
+  <TodoItem
+    key={tarea.id}
+    tarea={tarea}
+    toggleCompleted={toggleCompleted}
+    eliminarTarea={eliminarTarea}
+  />
+))
             ))}
         </div>
       )}
 
-      <ReactModal
-        isOpen={modalAbierto}
-        onRequestClose={cerrarModal}
-        className="bg-white p-6 rounded shadow-lg max-w-md mx-auto mt-20 outline-none transition-all"
-        overlayClassName="fixed inset-0 bg-black/50 bg-opacity-50 flex items-center justify-center"
-      >
-        {usuarioSeleccionado && (
-          <motion.div
-            className="text-center"
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.3 }}
-          >
-            <img
-              className="w-24 h-24 object-cover rounded-full mx-auto mb-2"
-              src={usuarioSeleccionado.foto}
-              alt={usuarioSeleccionado.nombre}
-            />
-            <h2 className="text-xl font-bold mb-4">
-              {usuarioSeleccionado.nombre} {usuarioSeleccionado.apellidos}
-            </h2>
-            <p>
-              <strong>Ocupación:</strong> {usuarioSeleccionado.ocupacion}
-            </p>
-            <p>
-              <strong>Perfil:</strong> {usuarioSeleccionado.perfil}
-            </p>
-            <p>
-              <strong>Correo:</strong> {usuarioSeleccionado.correo}
-            </p>
-            <p>
-              <strong>Intereses:</strong> {usuarioSeleccionado.intereses}
-            </p>
-            <button
-              onClick={cerrarModal}
-              className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-            >
-              Cerrar
-            </button>
-          </motion.div>
-        )}
-      </ReactModal>
+
+        
+          
+          <div className="max-w-md mx-auto mt-10 p-2  rounded shadow">
+      <h1 className="text-3xl font-bold mb-5 text-center">LISTA DE TAREAS</h1>
+      <div className="flex gap-3 mb-5">
+        <input className="flex-1 p-2 border rounded" type="text" value={input} onChange={(e) => setInput(e.target.value)} placeholder="Añadir Tarea" />
+        <button className="bg-blue-500 text-white px-4 p-y-2 rounded" onClick={agregarTarea} >Añadir Tareas</button>
+      </div>
+
+      <div className="space-y-2">
+        {tareas.map((tarea) => (<TodoItem key={tarea.id} tarea={tarea} toggleCompleted={toggleCompleted} eliminarTarea={eliminarTarea} />))}
+      </div>
+
+    </div>
+        
+
     </div>
   )
 }

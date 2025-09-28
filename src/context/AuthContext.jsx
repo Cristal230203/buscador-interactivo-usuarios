@@ -12,7 +12,7 @@ export function AuthProvider({ children }) {
 
   const login = (username, password) => {
     // Aquí iría la lógica real de autenticación
-    if (username === 'admin' && password === 'password') {
+    if (username === 'admin' && password === '1234') {
       setUser({ username: 'admin' })
       toast.success('Login exitoso!')
       navigate('/usuarios')
